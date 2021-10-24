@@ -1,12 +1,14 @@
 import { Router } from 'express';
-import health from './health';
 import auth from './auth';
+import health from './health';
+import pets from './pets';
 
 export default <
   {
     [key: string]: Router;
   }
 >{
+  '/auth': auth,
   '/health': health,
-  '/auth': auth
+  '/pets': pets
 };

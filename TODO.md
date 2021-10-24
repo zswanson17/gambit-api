@@ -4,3 +4,5 @@
 - handle unhandled errors
 - db off of public schema?
 - dynamic/class-based route loading (aka async thing)
+- delete token column
+- seperate out auth from user service; more extensive auth stuff

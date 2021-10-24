@@ -26,6 +26,11 @@ export class UserRepository extends BaseRepository<User> {
       return undefined;
     }
 
-    return result.rows[0];
+    return this.mapper(result.rows[0]);
+  }
+
+  private mapper(user: User): User {
+    user.id = parseInt(user.id as unknown as string);
+    return user;
   }
 }

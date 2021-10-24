@@ -1,4 +1,7 @@
 import { Inject, Service } from 'typedi';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { auth } from '../config';
 import { UserRepository } from '../db';
 import { RegisterUserRequest, User } from '../types';
 
@@ -6,17 +9,38 @@ import { RegisterUserRequest, User } from '../types';
 export class UserService {
   @Inject()
   userRepo!: UserRepository;
+
   public async register(input: RegisterUserRequest): Promise<User> {
     this.validateRegistration(input);
     const existingUser = await this.userRepo.getByEmail(input.email);
     if (existingUser) {
       throw Error(`User with email "${input.email}" already exists`);
     }
+
+    input.password = await this.encryptPassword(input.password as string);
+
     const user = await this.userRepo.insert(input);
+    user.token = this.getToken(user);
+
     return user;
   }
 
-  public validateRegistration(input: RegisterUserRequest) {
+  public async login(input: { email: string; password: string }) {
+    const user = await this.userRepo.getByEmail(input.email);
+    if (!user) {
+      throw Error(`No user found with email "${input.email}""`);
+    }
+
+    if (!(await this.isValidPassword(input.password, user.password as string))) {
+      throw Error('Invalid password');
+    }
+
+    user.token = this.getToken(user);
+
+    return user;
+  }
+
+  private validateRegistration(input: RegisterUserRequest) {
     const validators: [boolean, string][] = [
       [Boolean(input.email && input.email.length > 3), 'invalid e-mail'],
       [Boolean(input.firstName), 'invalid first name'],
@@ -28,5 +52,24 @@ export class UserService {
     if (errors.length) {
       throw Error(errors.map(([, message]) => message).join(';'));
     }
+  }
+
+  private encryptPassword(password: string): Promise<string> {
+    return bcrypt.hash(password, 10);
+  }
+
+  private getToken(user: User): string {
+    return jwt.sign(
+      {
+        id: user.id,
+        email: user.email
+      },
+      auth.tokenKey,
+      { expiresIn: '2h' }
+    );
+  }
+
+  private isValidPassword(password: string, hash: string): Promise<boolean> {
+    return bcrypt.compare(password, hash);
   }
 }

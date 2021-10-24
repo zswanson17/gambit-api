@@ -24,6 +24,7 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2021",
+    "typeRoots": ["./app/types/express.d.ts"],
     "types": ["node", "reflect-metadata", "jest"]
   },
   "include": ["app/**/*"],

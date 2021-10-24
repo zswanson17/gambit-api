@@ -9,9 +9,20 @@ const router = Router();
 router.post(
   '/register',
   asyncHandler(async function (request: Request, response: Response) {
-    const userInput = request.body as RegisterUserRequest;
-    const user = await Container.get(UserService).register(userInput);
-    response.json(user);
+    const input = request.body as RegisterUserRequest;
+    const user = await Container.get(UserService).register(input);
+    const { id, email, firstName, lastName, token } = user;
+    response.status(201).json({ id, email, firstName, lastName, token });
+  })
+);
+
+router.post(
+  '/login',
+  asyncHandler(async function (request: Request, response: Response) {
+    const input = request.body as { email: string; password: string };
+    const user = await Container.get(UserService).login(input);
+    const { id, email, firstName, lastName, token } = user;
+    response.status(200).json({ id, email, firstName, lastName, token });
   })
 );
 
