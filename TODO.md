@@ -1,3 +1,6 @@
 - prettier on-commit/save hooks
 - @ imports
 - eslint
+- handle unhandled errors
+- db off of public schema?
+- dynamic/class-based route loading (aka async thing)

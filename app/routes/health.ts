@@ -1,12 +1,15 @@
 import { Request, Response, Router } from 'express';
+import Container from 'typedi';
+import { PostgresProvider } from '../db';
 
 const router = Router();
 
-router.get('/', function (_request: Request, response: Response) {
-  console.log('request here', _request);
+router.get('/', async function (_request: Request, response: Response) {
+  const db = Boolean(await Container.get(PostgresProvider).ping());
+
   response.json({
-    http: 'ok',
-    db: 'ok'
+    http: true,
+    db
   });
 });
 
