@@ -1,7 +1,9 @@
+import 'reflect-metadata';
+import Container from 'typedi';
+import { ExpressHttpService } from './services';
+
 function start() {
-  console.log(`start shfit here`);
+  Container.set(ExpressHttpService, new ExpressHttpService(1717));
 }
 
 start();
-
-export {};

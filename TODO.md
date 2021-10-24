@@ -1,1 +1,3 @@
 - prettier on-commit/save hooks
+- @ imports
+- eslint
