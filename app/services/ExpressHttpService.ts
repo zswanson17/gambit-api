@@ -1,7 +1,9 @@
 import { Service } from 'typedi';
 import express, { Express, json, NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import cors from 'cors';
 import { auth } from '../config';
+import { ValidationError } from '../errors';
 import routes from '../routes';
 
 @Service()
@@ -17,6 +19,8 @@ export class ExpressHttpService {
 
   private setup() {
     this.server.use(json());
+    this.server.use(cors());
+
     this.applyAuthMiddleware();
     this.loadRoutes();
     this.applyErrorMiddleware();
@@ -59,8 +63,11 @@ export class ExpressHttpService {
 
   private applyErrorMiddleware() {
     this.server.use((error: Error, request: Request, response: Response, next: NextFunction) => {
+      if (error instanceof ValidationError) {
+        return response.status(400).json({ message: error.message });
+      }
       console.error(`Request error: ${request.url}`, error);
-      response.status(500).json({
+      return response.status(500).json({
         name: error.name,
         message: error.message
       });

@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { auth } from '../config';
 import { UserRepository } from '../db';
+import { ValidationError } from '../errors';
 import { RegisterUserRequest, User } from '../types';
 
 @Service()
@@ -37,6 +38,8 @@ export class UserService {
 
     user.token = this.getToken(user);
 
+    this.userRepo.update(user.id, { lastLoggedInOn: new Date().toISOString() });
+
     return user;
   }
 
@@ -50,7 +53,7 @@ export class UserService {
 
     const errors = validators.filter(([isValid]) => isValid === false);
     if (errors.length) {
-      throw Error(errors.map(([, message]) => message).join(';'));
+      throw new ValidationError(errors.map(([, message]) => message).join(';'));
     }
   }
 
@@ -62,7 +65,9 @@ export class UserService {
     return jwt.sign(
       {
         id: user.id,
-        email: user.email
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName
       },
       auth.tokenKey,
       { expiresIn: '2h' }

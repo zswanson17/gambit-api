@@ -1,5 +1,3 @@
-import { UserRepository } from 'db';
-
 export interface User {
   id: number;
   firstName: string;
@@ -8,6 +6,7 @@ export interface User {
   password?: string;
   token?: string;
   createdOn: Date;
+  lastLoggedInOn?: Date | string;
   iat?: number;
   exp?: number;
 }

@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS "User"(
     "email" varchar(100) NOT NULL,
     "password" varchar(100) NOT NULL,
     "token" text NULL,
-    "createdOn" timestamp without time zone default (now() at time zone 'utc') not NULL,
+    "createdOn" timestamp without time zone default (now() at time zone 'utc') NOT NULL,
+    "lastLoggedInOn" timestamp without time zone NULL,
     constraint pk_User primary key (id),
     constraint uk_User_email unique(email)
  );

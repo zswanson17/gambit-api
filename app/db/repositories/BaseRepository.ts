@@ -30,4 +30,20 @@ export abstract class BaseRepository<T> {
     const result = await this.db.query(sql, params);
     return result.rows[0];
   }
+
+  public async update(id: number, data: Partial<T>): Promise<T> {
+    const params: any[] = [];
+    let sql = `UPDATE "${this.tableName}" SET`;
+    let counter = 0;
+    sql += Object.keys(data).map((key, index) => {
+      params.push((data as any)[key]);
+      counter += 1;
+      return ` "${key}" = \$${counter}`;
+    });
+    params.push(id);
+    sql += ` WHERE id = \$${counter + 1} RETURNING *;`;
+
+    const result = await this.db.query(sql, params);
+    return result.rows[0];
+  }
 }
